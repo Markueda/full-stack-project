@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed } from "vue";
 
+const emit = defineEmits(["calculate"]);
+
 const Input = Object.freeze({
   ZERO: 0,
   ONE: 1,
@@ -23,7 +25,7 @@ const Input = Object.freeze({
   DELETE: 18,
 });
 
-const zeroDisabled = ref(false)
+const zeroDisabled = ref(false);
 
 const inputs = ref([
   { value: Input.CLEAR, class: "light", symbol: "AC" },
@@ -71,6 +73,7 @@ const displayText = computed(() => {
 
       if (input.value === Input.RESULT) {
         output += getResult();
+        emit("calculate", output);
       }
     }
     return output;
@@ -96,14 +99,98 @@ function getResult() {
     return input.value;
   }
   const values = register.value.map(mapValue);
-  console.log(values)
+  console.log("--- Result ---");
+
+  while (true) {
+    console.log(values.join());
+    const i = getOperationIndex(values);
+    const operation = values[i];
+
+    console.log("Operation Index: " + i);
+
+    let valueX = "";
+    let startX = 0;
+    let x = i;
+    while (true) {
+      x--;
+      const value = values[x];
+      if (value === Input.DECIMAL) {
+        valueX = "." + valueX;
+      } else if (value >= 0 && value <= 9) {
+        valueX = String(value) + valueX;
+      } else {
+        startX = x + 1;
+        break;
+      }
+    }
+    valueX = parseFloat(valueX);
+
+    let valueY = "";
+    let endY = 0;
+    let y = i;
+    while (true) {
+      y++;
+      const value = values[y];
+      if (value === Input.DECIMAL) {
+        valueY = valueY + ".";
+      } else if (value >= 0 && value <= 9) {
+        valueY = valueY + String(value);
+      } else {
+        endY = y;
+        break;
+      }
+    }
+    valueY = parseFloat(valueY);
+
+    console.log("valueX: " + valueX);
+    console.log("valueY: " + valueY);
+
+    switch (operation) {
+      case Input.ADDITION:
+        const sum = String(valueX + valueY);
+        values.splice(startX, endY - startX, sum);
+        break;
+      case Input.SUBTRACTION:
+        const difference = String(valueX - valueY);
+        values.splice(startX, endY - startX, difference);
+        break;
+      case Input.MULTIPLICATION:
+        const product = String(valueX * valueY);
+        values.splice(startX, endY - startX, product);
+        break;
+      case Input.DIVISION:
+        const quotient = String(valueX / valueY);
+        values.splice(startX, endY - startX, quotient);
+        break;
+      default:
+        return " NaN";
+    }
+
+    if (values.length === 2) {
+      return " " + values[0];
+    }
+    else if (values.length < 2) {
+      return " NaN";
+    }
+  }
+}
+
+function getOperationIndex(values) {
   for (let i = 0; i < values.length; i++) {
     const value = values[i];
+    if (value === Input.MULTIPLICATION || value === Input.DIVISION) {
+      return i;
+    }
   }
-
-  let result = 0;
-  return " " + result;
+  for (let i = 0; i < values.length; i++) {
+    const value = values[i];
+    if (value === Input.ADDITION || value === Input.SUBTRACTION) {
+      return i;
+    }
+  }
+  return -1;
 }
+
 </script>
 
 <template>

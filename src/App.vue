@@ -1,13 +1,14 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import CalculatorView from "@/views/CalculatorView.vue";
 </script>
 
 <template>
   <header>
     <div class="wrapper">
       <nav>
-        <RouterLink to="/">Calculator</RouterLink> |
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink :to="{ name: 'calculator' }">Calculator</RouterLink> |
+        <RouterLink :to="{ name: 'contact' }">Contact</RouterLink>
       </nav>
     </div>
   </header>

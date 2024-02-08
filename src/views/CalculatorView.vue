@@ -1,13 +1,20 @@
 <script setup>
+import { ref } from "vue";
 import Calculator from "@/components/Calculator.vue";
 import CalculatorLog from "@/components/CalculatorLog.vue";
+
+const log = ref([])
+
+function updateLog(output) {
+  log.value.push(output);
+}
 </script>
 
 <template>
   <main>
     <div class="flex-container">
-      <Calculator/>
-      <CalculatorLog log="Hello"/>
+      <Calculator @calculate="updateLog"/>
+      <CalculatorLog :log="log"/>
     </div>
   </main>
 </template>
