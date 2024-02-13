@@ -1,3 +1,7 @@
+<script setup>
+import Form from "@/components/Form.vue";
+</script>
+
 <template>
-  <h1>This is an about page</h1>
+  <Form/>
 </template>
