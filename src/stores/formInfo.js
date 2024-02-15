@@ -23,4 +23,4 @@ export const useFormInfoStore = defineStore("formInfo", {
             localStorage.setItem("email", email);
         }
     }
-})
+});

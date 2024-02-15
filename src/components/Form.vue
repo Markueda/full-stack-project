@@ -52,6 +52,7 @@ function submitForm() {
     <form>
       <h3>Name:</h3>
       <input
+          id="name"
           v-model="nameModel"
           type="text"
           placeholder="Name"
@@ -61,6 +62,7 @@ function submitForm() {
 
       <h3>Email:</h3>
       <input
+          id="email"
           v-model="emailModel"
           type="text"
           placeholder="Email"
@@ -70,6 +72,7 @@ function submitForm() {
 
       <h3>Message:</h3>
       <textarea
+          id="message"
           v-model="messageModel"
           placeholder="Message"
           class="field"
@@ -77,7 +80,7 @@ function submitForm() {
 
       <br>
 
-      <button type="submit" :disabled="!isValid" @click.prevent="submitForm">Submit</button>
+      <button id="submit" type="submit" :disabled="!isValid" @click.prevent="submitForm">Submit</button>
     </form>
   </div>
 </template>
