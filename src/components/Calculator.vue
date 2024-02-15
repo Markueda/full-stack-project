@@ -25,7 +25,7 @@ const Input = Object.freeze({
   DELETE: 18,
 });
 
-const zeroDisabled = ref(false);
+const showingResult = ref(false);
 
 const inputs = ref([
   { value: Input.CLEAR, class: "light", symbol: "AC" },
@@ -44,7 +44,7 @@ const inputs = ref([
   { value: Input.TWO, class: "dark", symbol: "2" },
   { value: Input.THREE, class: "dark", symbol: "3" },
   { value: Input.ADDITION, class: "orange", symbol: "+" },
-  { value: Input.ZERO, disabled: zeroDisabled, class: "dark zero", symbol: "0" },
+  { value: Input.ZERO, class: "dark zero", symbol: "0" },
   { value: Input.DECIMAL, class: "dark", symbol: "," },
   { value: Input.RESULT, class: "orange", symbol: "=" },
 ]);
@@ -74,6 +74,7 @@ const displayText = computed(() => {
       if (input.value === Input.RESULT) {
         output += getResult();
         emit("calculate", output);
+        showingResult.value = true;
       }
     }
     return output;
@@ -84,12 +85,19 @@ function handleInput(input) {
   switch (input.value) {
     case Input.CLEAR:
       register.value = [];
+      showingResult.value = false;
       break;
     case Input.DELETE:
       register.value.pop();
+      showingResult.value = false;
+      break;
+    case Input.ANSWER:
       break;
     default:
-      if (register.value.length === 0) {}
+      if (showingResult.value) {
+        register.value = [];
+        showingResult.value = false;
+      }
       register.value.push(input);
   }
 }
@@ -99,14 +107,10 @@ function getResult() {
     return input.value;
   }
   const values = register.value.map(mapValue);
-  console.log("--- Result ---");
 
   while (true) {
-    console.log(values.join());
     const i = getOperationIndex(values);
     const operation = values[i];
-
-    console.log("Operation Index: " + i);
 
     let valueX = "";
     let startX = 0;
@@ -116,7 +120,7 @@ function getResult() {
       const value = values[x];
       if (value === Input.DECIMAL) {
         valueX = "." + valueX;
-      } else if (value >= 0 && value <= 9) {
+      } else if ((value >= 0 && value <= 9) || (typeof value === "string" && value !== "NaN")) {
         valueX = String(value) + valueX;
       } else {
         startX = x + 1;
@@ -133,7 +137,7 @@ function getResult() {
       const value = values[y];
       if (value === Input.DECIMAL) {
         valueY = valueY + ".";
-      } else if (value >= 0 && value <= 9) {
+      } else if ((value >= 0 && value <= 9) || (typeof value === "string" && value !== "NaN")) {
         valueY = valueY + String(value);
       } else {
         endY = y;
@@ -142,8 +146,9 @@ function getResult() {
     }
     valueY = parseFloat(valueY);
 
-    console.log("valueX: " + valueX);
-    console.log("valueY: " + valueY);
+    if (i === -1) {
+      return " " + valueY;
+    }
 
     switch (operation) {
       case Input.ADDITION:

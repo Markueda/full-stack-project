@@ -1,6 +1,7 @@
 <script setup>
 import {ref, computed, defineModel, onMounted} from "vue";
 import { useFormInfoStore } from "@/stores/formInfo.js";
+import axios from "axios";
 
 const store = useFormInfoStore();
 
@@ -15,6 +16,11 @@ const isValid = computed(() => {
   return nameValid && emailValid && messageValid;
 });
 
+onMounted(() => {
+  nameModel.value = store.getName;
+  emailModel.value = store.getEmail;
+});
+
 function updateName() {
   store.setName(nameModel.value);
 }
@@ -23,10 +29,20 @@ function updateEmail() {
   store.setEmail(emailModel.value);
 }
 
-onMounted(() => {
-  nameModel.value = store.getName;
-  emailModel.value = store.getEmail;
-});
+function submitForm() {
+  console.log("Submitting form")
+  axios.post("https://my-json-server.typicode.com/markueda/full-stack-project/reviews",{
+    name: nameModel.value,
+    email: emailModel.value,
+    message: messageModel.value,
+  }).then((response) => {
+    console.log(response);
+    alert("Success!");
+  }).catch((error) => {
+    console.log(error);
+    alert("There was an error.");
+  });
+}
 
 </script>
 
@@ -61,7 +77,7 @@ onMounted(() => {
 
       <br>
 
-      <button type="submit" :disabled="!isValid">Submit</button>
+      <button type="submit" :disabled="!isValid" @click.prevent="submitForm">Submit</button>
     </form>
   </div>
 </template>
